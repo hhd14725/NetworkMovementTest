@@ -6,8 +6,8 @@ using Photon.Pun;
 public class PlayerController : MonoBehaviourPun, IPunObservable
 {
     [Header("Move Settings")]
-    public float thrustForce = 10f;
-    public float maxSpeed = 5f;
+    public float thrustForce = 40f;
+    public float maxSpeed = 100f;
     public float boostMultiplier = 2f;
     public float decelerationForce = 8f;
 
