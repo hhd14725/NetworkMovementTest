@@ -1037,7 +1037,7 @@ MonoBehaviour:
   leftRightGlideReduction: 0.98
   bounceFactor: 0.2
   projectilePrefabName: Projectile
-  muzzleTransform: {fileID: 0}
+  muzzleTransform: {fileID: 219638032603225156}
   fireCooldown: 0.2
 --- !u!136 &1447790945190070933
 CapsuleCollider:

@@ -193,7 +193,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     public void OnFire(InputAction.CallbackContext context)
     {
-        Debug.Log("OnFire! phase=" + context.phase);
         if (context.performed)
         {
             TryFire();
