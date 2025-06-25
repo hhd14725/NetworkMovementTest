@@ -24,18 +24,45 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Boost",
+                    "name": "Fire",
                     "type": "Button",
-                    "id": "e527ba18-8880-421c-b527-69194b2fa38b",
+                    "id": "586fed52-8e14-4ea6-98ae-309845a81383",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Fire",
+                    "name": "ThrustUp",
                     "type": "Button",
-                    "id": "586fed52-8e14-4ea6-98ae-309845a81383",
+                    "id": "28e5a7bd-e22a-455b-a054-fbf14ea4ffb7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ThrustDown",
+                    "type": "Button",
+                    "id": "d3f20085-fb2d-4ceb-aecd-a66e87c85339",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RollLeft",
+                    "type": "Button",
+                    "id": "0bc4ab5f-b966-44c6-9d4f-fa3decc64bc2",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RollRight",
+                    "type": "Button",
+                    "id": "f6919ba9-e656-4dc1-922d-bf283a065306",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -111,23 +138,56 @@
                 },
                 {
                     "name": "",
-                    "id": "3562405a-e1f9-4de0-8268-5715c9a67847",
-                    "path": "<Keyboard>/leftShift",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Boost",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "7629d386-be2f-47bb-9cc8-335689f754bd",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Fire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9c75cec2-bbbf-48f4-8ea7-3563a3be02b4",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ThrustUp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "26464103-10f8-461e-9894-9af39f83d356",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ThrustDown",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "92f8be21-04f1-4eb4-95f1-22d10a75e785",
+                    "path": "<Keyboard>/z",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RollLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8d173c07-ede5-4bcc-acff-3d76fca5f093",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RollRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

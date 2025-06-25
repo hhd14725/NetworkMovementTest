@@ -18,7 +18,20 @@ public class Projectile : MonoBehaviourPun
         rb.useGravity = false;
         spawnPos = transform.position;
     }
+    // 네트워크 Instantiate 직후 호출
+    public void Initialize(Collider ownerCollider)
+    {
+        // 0.2초 동안 플레이어 콜라이더 무시
+        Physics.IgnoreCollision(GetComponent<Collider>(), ownerCollider, true);
+        Invoke(nameof(ReenableCollision), 0.2f);
+    }
 
+    void ReenableCollision()
+    {
+        // 발사 후엔 다시 충돌 복구
+        Physics.IgnoreCollision(GetComponent<Collider>(),
+            GetComponent<Collider>(), false);
+    }
     void Start()
     {
         rb.velocity = transform.forward * speed;

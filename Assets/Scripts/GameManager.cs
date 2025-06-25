@@ -58,20 +58,21 @@ public class GameManager : MonoBehaviourPunCallbacks
         GameObject localPlayer = PhotonNetwork.Instantiate(playerPrefabName, pos, rot);
         Debug.Log($"SpawnLocalPlayer for actor {actorNum}");
 
-        var cam = Camera.main;
-        if (cam != null)
-        {
-            var tpc = cam.GetComponent<ThirdPersonCamera>();
-            if (tpc != null)
-            {
-                tpc.target = localPlayer.transform;
-                Debug.Log($"Camera target set to {localPlayer.name}");
-            }
-            else
-                Debug.LogError("ThirdPersonCamera 컴포넌트 없음");
-        }
-        else
-            Debug.LogError("Camera.main 없음");
+      
+        //var cam = Camera.main;
+        //if (cam != null)
+        //{
+        //    var tpc = cam.GetComponent<ThirdPersonCamera>();
+        //    if (tpc != null)
+        //    {
+        //        tpc.target = localPlayer.transform;
+        //        Debug.Log($"Camera target set to {localPlayer.name}");
+        //    }
+        //    else
+        //        Debug.LogError("ThirdPersonCamera 컴포넌트 없음");
+        //}
+        //else
+        //    Debug.LogError("Camera.main 없음");
 
     }
 
