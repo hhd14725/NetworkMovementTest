@@ -62,16 +62,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         //rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         pi = GetComponent<PlayerInput>();
-        if (photonView.IsMine)
-        {
-            // 로컬 플레이어: 입력 활성화
-            pi.enabled = true;
-        }
-        else
-        {
-            // 원격 플레이어: 입력 비활성화
-            pi.enabled = false;
-        }
+        pi.actions.Disable();
 
         networkPos = transform.position;
         networkRot = transform.rotation;
@@ -81,12 +72,53 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     {
      if(photonView.IsMine)
         {
+            pi.actions.Enable();
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
+        }
+        else
+        {
+            pi.actions.Disable();
         }
 
     }
 
+    void OnEnable()
+    {
+        if (!photonView.IsMine) return;
+        var a = pi.actions;
+        a["Thrust"].performed += OnThrust;
+        a["Thrust"].canceled += ctx => thrust1D = 0f;
+        a["Strafe"].performed += OnStrafe;
+        a["Strafe"].canceled += ctx => strafe1D = 0f;
+        a["UpDown"].performed += OnUpDown;
+        a["UpDown"].canceled += ctx => upDown1D = 0f;
+        a["RollKB"].performed += OnRoll;
+        a["RollKB"].canceled += ctx => roll1D = 0f;
+        a["PitchYaw"].performed += OnPitchYaw;
+        a["PitchYaw"].canceled += ctx => pitchYaw = Vector2.zero;
+        a["Fire"].performed += OnFire;
+
+    }
+
+    void OnDisable()
+    {
+        if (!photonView.IsMine) return;
+
+        var a = pi.actions;
+        a["Thrust"].performed -= OnThrust;
+        a["Thrust"].canceled -= ctx => thrust1D = 0f;
+        a["Strafe"].performed -= OnStrafe;
+        a["Strafe"].canceled -= ctx => strafe1D = 0f;
+        a["UpDown"].performed -= OnUpDown;
+        a["UpDown"].canceled -= ctx => upDown1D = 0f;
+        a["RollKB"].performed -= OnRoll;
+        a["RollKB"].canceled -= ctx => roll1D = 0f;
+        a["PitchYaw"].performed -= OnPitchYaw;
+        a["PitchYaw"].canceled -= ctx => pitchYaw = Vector2.zero;
+
+        a["Fire"].performed -= OnFire;
+    }
 
 
   
