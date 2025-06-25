@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     public string projectilePrefabName = "Projectile";
     public Transform muzzleTransform;
     public float fireCooldown = 0.2f;
-    private float lastFireTime;
+    private float lastFireTime = 0;
 
 
     // smoothing
@@ -58,9 +58,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.useGravity = false;
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
-        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        //rb.useGravity = false;
+        //rb.interpolation = RigidbodyInterpolation.Interpolate;
+        //rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
         networkPos = transform.position;
         networkRot = transform.rotation;
