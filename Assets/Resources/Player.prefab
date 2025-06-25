@@ -823,8 +823,6 @@ GameObject:
   - component: {fileID: 8179391435843349594}
   - component: {fileID: 584129654734207698}
   - component: {fileID: 1447790945190070933}
-  - component: {fileID: 8216745400360085426}
-  - component: {fileID: 7543885636407577268}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -893,8 +891,6 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 584129654734207698}
-  - {fileID: 8216745400360085426}
-  - {fileID: 7543885636407577268}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -906,11 +902,11 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3098989436882764216}
   serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0
+  m_Mass: 5
+  m_Drag: 0.05
+  m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaTensor: {x: 0.1, y: 0.1, z: 0.1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
@@ -920,9 +916,9 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &8179391435843349594
@@ -1022,7 +1018,7 @@ MonoBehaviour:
   fireCooldown: 0.2
   cameraPivot: {fileID: 71038875162939086}
   animator: {fileID: 0}
-  coastingDrag: 0.01
+  coastingDrag: 0.05
 --- !u!136 &1447790945190070933
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1046,38 +1042,6 @@ CapsuleCollider:
   m_Height: 1.9
   m_Direction: 1
   m_Center: {x: 0, y: 0.82, z: 0}
---- !u!114 &8216745400360085426
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3098989436882764216}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64179f3720bbfe947b7724caa67b7c1d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizeVelocity: 1
-  m_SynchronizeAngularVelocity: 1
-  m_TeleportEnabled: 0
-  m_TeleportIfDistanceGreaterThan: 3
---- !u!114 &7543885636407577268
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3098989436882764216}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &3620385201238671497
 GameObject:
   m_ObjectHideFlags: 0

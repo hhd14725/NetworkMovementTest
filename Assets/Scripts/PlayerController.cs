@@ -43,10 +43,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.useGravity = false;
-        rb.drag = 0f;
-        rb.angularDrag = 0.05f;
-        rb.interpolation = RigidbodyInterpolation.Extrapolate;
+        //rb.useGravity = false;
+        //rb.drag = 0f;
+        //rb.angularDrag = 0.05f;
+        //rb.interpolation = RigidbodyInterpolation.Extrapolate;
 
         pi = GetComponent<PlayerInput>();
         pi.actions.Disable();
@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         networkPos = transform.position;
         networkRot = transform.rotation;
     }
-
+        
     void Start()
     {
         if (photonView.IsMine)
@@ -109,6 +109,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     void FixedUpdate()
     {
+       
+
         if (photonView.IsMine)
         {
 
