@@ -920,7 +920,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 0
@@ -973,12 +973,24 @@ MonoBehaviour:
     m_ActionName: Player/Look[/Mouse/delta]
   - m_PersistentCalls:
       m_Calls: []
-    m_ActionId: e527ba18-8880-421c-b527-69194b2fa38b
-    m_ActionName: Player/Boost[/Keyboard/leftShift]
-  - m_PersistentCalls:
-      m_Calls: []
     m_ActionId: 586fed52-8e14-4ea6-98ae-309845a81383
     m_ActionName: Player/Fire[/Mouse/leftButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 28e5a7bd-e22a-455b-a054-fbf14ea4ffb7
+    m_ActionName: Player/ThrustUp[/Keyboard/e]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: d3f20085-fb2d-4ceb-aecd-a66e87c85339
+    m_ActionName: Player/ThrustDown[/Keyboard/q]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 0bc4ab5f-b966-44c6-9d4f-fa3decc64bc2
+    m_ActionName: Player/RollLeft[/Keyboard/z]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: f6919ba9-e656-4dc1-922d-bf283a065306
+    m_ActionName: Player/RollRight[/Keyboard/c]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -996,8 +1008,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fafc22c3fda37d49ac4d1ad53889f68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forwardThrust: 400
-  strafeThrust: 50
+  forwardThrust: 450
+  strafeThrust: 120
   verticalThrust: 50
   maxSpeed: 500
   yawSpeed: 120
@@ -1010,6 +1022,7 @@ MonoBehaviour:
   fireCooldown: 0.2
   cameraPivot: {fileID: 71038875162939086}
   animator: {fileID: 0}
+  coastingDrag: 0.01
 --- !u!136 &1447790945190070933
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2011,7 +2024,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8490466652522197346}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.23155989, y: -0.000000016738722, z: 0.000000003984308, w: 0.97282064}
+  m_LocalRotation: {x: 0.23155989, y: 0.00000001673872, z: -0.0000000039843076, w: 0.97282064}
   m_LocalPosition: {x: 0, y: 4.1809998, z: -6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

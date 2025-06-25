@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
 
@@ -18,6 +18,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     [Header("References")]
     public Transform cameraPivot;
     public Animator animator;
+
+    [Header("Friction Settings")]
+    [Tooltip("ì…ë ¥ì´ ì—†ì„ ë•Œ ì ìš©í•  drag ê°’. (ë†’ì„ìˆ˜ë¡ ë¹¨ë¦¬ ë©ˆì¶¤)")]
+    public float coastingDrag = 0.01f;
+
 
     // smoothing
     private Vector3 networkPos;
@@ -39,7 +44,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     {
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
-        rb.drag = 0; rb.angularDrag = 0;
+        rb.drag = 0f;
+        rb.angularDrag = 0.05f;
         rb.interpolation = RigidbodyInterpolation.Extrapolate;
 
         pi = GetComponent<PlayerInput>();
@@ -105,41 +111,47 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     {
         if (photonView.IsMine)
         {
-            // ÀÌµ¿·Â
+
+            // ì´ë™ë ¥
             Vector3 thrust = transform.forward * moveInput.y * forwardThrust
                            + transform.right * moveInput.x * strafeThrust
                            + transform.up * ((thrustUp ? 1f : 0f) + (thrustDown ? -1f : 0f)) * verticalThrust;
             rb.AddForce(thrust, ForceMode.Acceleration);
 
-            // È¸Àü ÅäÅ©: Yaw, Roll ¸¸
+            //ê°ì†ë¡œì§
+            //bool isThrusting = moveInput.sqrMagnitude > 0f || thrustUp || thrustDown;
+            //rb.drag = isThrusting ? 0f : coastingDrag;
+
+            // íšŒì „ í† í¬: Yaw, Roll ë§Œ
             float yaw = lookInput.x * yawSpeed * Time.fixedDeltaTime;
             float delta = -lookInput.y * pitchSpeed * Time.fixedDeltaTime;
             float roll = (rollRight ? 1f : 0f) * rollSpeed * Time.fixedDeltaTime
                        - (rollLeft ? 1f : 0f) * rollSpeed * Time.fixedDeltaTime;
             rb.AddRelativeTorque(new Vector3(delta, yaw, roll), ForceMode.Acceleration);
 
-            // ¼Óµµ Á¦ÇÑ
+            // ì†ë„ ì œí•œ
             if (rb.velocity.magnitude > maxSpeed)
                 rb.velocity = rb.velocity.normalized * maxSpeed;
 
-            // °¨¼è
-            rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, linearDamping);
+
+            // ê°ì‡ 
+            //rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, linearDamping);
             rb.angularVelocity = Vector3.Lerp(rb.angularVelocity, Vector3.zero, angularDamping);
 
-            // ÃÑ±¸ ¿À¸®¿£Å×ÀÌ¼Ç º¸Á¤ (muzzleTransformÀÌ Ä³¸¯ÅÍ ·ÎÄÃ ZÃà°ú ÀÏÄ¡ÇÏµµ·Ï È®ÀÎ)
+            // ì´êµ¬ ì˜¤ë¦¬ì—”í…Œì´ì…˜ ë³´ì • (muzzleTransformì´ ìºë¦­í„° ë¡œì»¬ Zì¶•ê³¼ ì¼ì¹˜í•˜ë„ë¡ í™•ì¸)
             if (muzzleTransform != null)
                 muzzleTransform.rotation = transform.rotation;
 
-            // ¾Ö´Ï¸ŞÀÌÅÍ
-            if (animator)
-            {
-                animator.SetFloat("Speed", rb.velocity.magnitude);
-                animator.SetFloat("Vertical", Vector3.Dot(transform.up, rb.velocity));
-            }
+            // ì• ë‹ˆë©”ì´í„°
+            //if (animator)
+            //{
+            //    animator.SetFloat("Speed", rb.velocity.magnitude);
+            //    animator.SetFloat("Vertical", Vector3.Dot(transform.up, rb.velocity));
+            //}
         }
         else
         {
-            // ¿ø°İ ÇÃ·¹ÀÌ¾î º¸°£¡¤¿¹Ãø
+            // ì›ê²© í”Œë ˆì´ì–´ ë³´ê°„Â·ì˜ˆì¸¡
             float lag = (Time.time - lastPacketTime);
             Vector3 predictedPos = networkPos + networkVel * lag;
             rb.position = Vector3.Lerp(rb.position, predictedPos, 0.1f);
@@ -151,18 +163,18 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     //{
     //    if (!photonView.IsMine || cameraPivot == null) return;
 
-    //    // ´©Àû ÇÇÄ¡ °è»ê (Á¦ÇÑ ¾øÀ½)
+    //    // ëˆ„ì  í”¼ì¹˜ ê³„ì‚° (ì œí•œ ì—†ìŒ)
     //    float delta = -lookInput.y * pitchSpeed * Time.deltaTime;
     //    pitchAngle += delta;
 
-    //    // Pivot¿¡ ·ÎÄÃ XÃà È¸Àü¸¸ ¼³Á¤
+    //    // Pivotì— ë¡œì»¬ Xì¶• íšŒì „ë§Œ ì„¤ì •
     //    cameraPivot.localRotation = Quaternion.Euler(pitchAngle, 0f, 0f);
     //}
     private void TryFire()
     {
         if (Time.time - lastFireTime < fireCooldown || muzzleTransform == null) return;
         lastFireTime = Time.time;
-        // ÃÑ¾Ë ÃÊ±â ¼Óµµ ¼¼ÆÃ
+        // ì´ì•Œ ì´ˆê¸° ì†ë„ ì„¸íŒ…
         var proj = PhotonNetwork.Instantiate(projectilePrefabName,
             muzzleTransform.position,
             muzzleTransform.rotation);
@@ -176,12 +188,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     }
 
-    // ³×Æ®¿öÅ© µ¿±âÈ­
+    // ë„¤íŠ¸ì›Œí¬ ë™ê¸°í™”
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
         {
-            // ·ÎÄÃ ÇÃ·¹ÀÌ¾î »óÅÂ Àü¼Û
+            // ë¡œì»¬ í”Œë ˆì´ì–´ ìƒíƒœ ì „ì†¡
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
             stream.SendNext(rb.velocity);
@@ -189,7 +201,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         }
         else
         {
-            // ¿ø°İ ¼ö½Å
+            // ì›ê²© ìˆ˜ì‹ 
             networkPos = (Vector3)stream.ReceiveNext();
             networkRot = (Quaternion)stream.ReceiveNext();
             networkVel = (Vector3)stream.ReceiveNext();
