@@ -60,7 +60,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         rb = GetComponent<Rigidbody>();
         //rb.useGravity = false;
         //rb.interpolation = RigidbodyInterpolation.Interpolate;
-        //rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
         networkPos = transform.position;
         networkRot = transform.rotation;
@@ -97,19 +97,27 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             if (muzzleTransform != null)
                 muzzleTransform.rotation = transform.rotation;
         }
+        else
+        {
+            float lag = Time.time - lastPacketTime;
+            Vector3 predictedPos = networkPos + networkVel * lag;
+            transform.position = Vector3.Lerp(transform.position, predictedPos, 0.1f);
+            transform.rotation = Quaternion.Slerp(transform.rotation, networkRot, 0.1f);
+
+        }
 
     }
 
-    void LateUpdate()
-    {
-        if (photonView.IsMine) return;
+    //void LateUpdate()
+    //{
+    //    if (photonView.IsMine) return;
 
-        // 원격 보간: transform만 갱신
-        float lag = Time.time - lastPacketTime;
-        Vector3 predictedPos = networkPos + networkVel * lag;
-        transform.position = Vector3.Lerp(transform.position, predictedPos, 0.1f);
-        transform.rotation = Quaternion.Slerp(transform.rotation, networkRot, 0.1f);
-    }
+    //    // 원격 보간: transform만 갱신
+    //    float lag = Time.time - lastPacketTime;
+    //    Vector3 predictedPos = networkPos + networkVel * lag;
+    //    transform.position = Vector3.Lerp(transform.position, predictedPos, 0.1f);
+    //    transform.rotation = Quaternion.Slerp(transform.rotation, networkRot, 0.1f);
+    //}
 
     void HandleInPuteRotate()
     {
@@ -247,7 +255,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
             stream.SendNext(rb.velocity);
-            stream.SendNext(rb.angularVelocity);
+            //stream.SendNext(rb.angularVelocity);
         }
         else
         {
@@ -255,7 +263,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             networkPos = (Vector3)stream.ReceiveNext();
             networkRot = (Quaternion)stream.ReceiveNext();
             networkVel = (Vector3)stream.ReceiveNext();
-            networkAngVel = (Vector3)stream.ReceiveNext();
+            //networkAngVel = (Vector3)stream.ReceiveNext();
             lastPacketTime = Time.time;
         }
     }
