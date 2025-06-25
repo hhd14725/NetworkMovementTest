@@ -11,6 +11,8 @@ public class CinemachineCameraController : MonoBehaviourPun
     {
         vCam = GetComponent<CinemachineVirtualCamera>();
         vCam.Priority = 0;  // 기본 우선순위
+        vCam.Follow = null;
+        vCam.LookAt = null;
     }
 
     void Start()

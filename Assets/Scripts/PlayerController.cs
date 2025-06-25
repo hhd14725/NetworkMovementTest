@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     public float fireCooldown = 0.2f;
     private float lastFireTime = 0;
 
-
+    private PlayerInput pi;
     // smoothing
     private Vector3 networkPos;
     private Quaternion networkRot;
@@ -61,6 +61,17 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         //rb.useGravity = false;
         //rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        pi = GetComponent<PlayerInput>();
+        if (photonView.IsMine)
+        {
+            // 로컬 플레이어: 입력 활성화
+            pi.enabled = true;
+        }
+        else
+        {
+            // 원격 플레이어: 입력 비활성화
+            pi.enabled = false;
+        }
 
         networkPos = transform.position;
         networkRot = transform.rotation;
@@ -68,12 +79,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     void Start()
     {
-     
+     if(photonView.IsMine)
+        {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
+        }
 
-       
-     
     }
 
 
@@ -254,7 +265,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
             stream.SendNext(rb.velocity);
-            //stream.SendNext(rb.angularVelocity);
+            stream.SendNext(rb.angularVelocity);
         }
         else
         {
@@ -262,7 +273,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             networkPos = (Vector3)stream.ReceiveNext();
             networkRot = (Quaternion)stream.ReceiveNext();
             networkVel = (Vector3)stream.ReceiveNext();
-            //networkAngVel = (Vector3)stream.ReceiveNext();
+            networkAngVel = (Vector3)stream.ReceiveNext();
             lastPacketTime = Time.time;
         }
     }
