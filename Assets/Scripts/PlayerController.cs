@@ -68,12 +68,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     void Start()
     {
-        if(photonView.IsMine)
-        {
+     
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
 
-        }
+       
      
     }
 
@@ -193,6 +192,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     public void OnFire(InputAction.CallbackContext context)
     {
+        if (!photonView.IsMine) return;
         if (context.performed)
         {
             TryFire();
