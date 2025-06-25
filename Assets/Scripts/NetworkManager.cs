@@ -1,29 +1,24 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 using Photon.Realtime;
-using System.Collections.Generic;
 using TMPro;
+using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
     public static NetworkManager Instance { get; private set; }
 
-    // Title UI
     private TMP_InputField titleNicknameInput;
+    private Button titleConnectBtn;
 
-    // Lobby UI
     private TMP_InputField lobbyRoomNameInput;
     private Button lobbyCreateBtn;
     private Button lobbyRefreshBtn;
     private Button lobbyBackBtn;
     private Transform lobbyContent;
     private GameObject lobbyButtonPrefab;
-
-    // Game setup
-    private List<Transform> spawnPoints;
-    private GameObject playerPrefab;
 
     void Awake()
     {
@@ -34,37 +29,52 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
         PhotonNetwork.AutomaticallySyncScene = true;
     }
-
     void Start()
     {
+        // 씬 전환 콜백 등록
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
+
     void OnDestroy()
     {
+        // 씬 전환 콜백 해제
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    // 씬 로드 후 처리
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        switch (scene.name)
+        if (scene.name == "Lobby")
         {
-            case "Title": break;
-            case "Lobby": PhotonNetwork.JoinLobby(); break;
-            case "Game": if (PhotonNetwork.InRoom) SpawnPlayer(); break;
+            PhotonNetwork.JoinLobby();
         }
     }
 
-    // Registration methods
     public void RegisterTitleUI(TMP_InputField nicknameInput, Button connectBtn)
     {
         titleNicknameInput = nicknameInput;
-        connectBtn.onClick.AddListener(OnTitleConnect);
-        // 이전 닉네임 로드
+        titleConnectBtn = connectBtn;
+        titleConnectBtn.onClick.AddListener(OnTitleConnect);
         if (PlayerPrefs.HasKey("NickName"))
             titleNicknameInput.text = PlayerPrefs.GetString("NickName");
+    }
+
+    void OnTitleConnect()
+    {
+        string nick = string.IsNullOrEmpty(titleNicknameInput.text)
+            ? "Player" + Random.Range(1000, 9999)
+            : titleNicknameInput.text;
+        PhotonNetwork.NickName = nick;
+        PlayerPrefs.SetString("NickName", nick);
+        PlayerPrefs.Save();
+        PhotonNetwork.ConnectUsingSettings();
+    }
+
+    public override void OnConnectedToMaster()
+    {
+        SceneManager.LoadScene("Lobby");
     }
 
     public void RegisterLobbyUI(
@@ -87,74 +97,49 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         lobbyBackBtn.onClick.AddListener(OnBackToTitle);
     }
 
-    public void RegisterGameSetup(List<Transform> spawns, GameObject prefab)
-    {
-        spawnPoints = spawns;
-        playerPrefab = prefab;
-    }
-
-    // Title callback
-    void OnTitleConnect()
-    {
-        string nick = string.IsNullOrEmpty(titleNicknameInput.text)
-            ? "Player" + Random.Range(1000, 9999)
-            : titleNicknameInput.text;
-        PhotonNetwork.NickName = nick;
-        PlayerPrefs.SetString("NickName", nick);
-        PlayerPrefs.Save();
-        PhotonNetwork.ConnectUsingSettings();
-    }
-
-    public override void OnConnectedToMaster()
-    {
-        SceneManager.LoadScene("Lobby");
-    }
-
-    // Lobby callbacks
     void OnCreateRoom()
     {
         string rm = string.IsNullOrEmpty(lobbyRoomNameInput.text)
             ? "Room" + Random.Range(1000, 9999)
             : lobbyRoomNameInput.text;
-        PhotonNetwork.CreateRoom(rm, new RoomOptions { MaxPlayers = 6 });
+        var options = new RoomOptions
+        {
+            MaxPlayers = 6,
+            EmptyRoomTtl = 0,
+            CleanupCacheOnLeave = true
+        };
+        PhotonNetwork.CreateRoom(rm, options);
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> rooms)
     {
         if (lobbyContent == null || lobbyButtonPrefab == null) return;
-        foreach (Transform c in lobbyContent) Destroy(c.gameObject);
+        foreach (Transform child in lobbyContent)
+            Destroy(child.gameObject);
         foreach (var info in rooms)
         {
             var btn = Instantiate(lobbyButtonPrefab, lobbyContent);
-            btn.GetComponentInChildren<Text>().text =
-                $"{info.Name} ({info.PlayerCount}/{info.MaxPlayers})";
+            var label = btn.GetComponentInChildren<TMP_Text>();
+            if (label != null)
+                label.text = $"{info.Name} ({info.PlayerCount}/{info.MaxPlayers})";
             btn.GetComponent<Button>().onClick.AddListener(() => PhotonNetwork.JoinRoom(info.Name));
         }
     }
 
     public override void OnJoinedRoom()
     {
-        SceneManager.LoadScene("Game");
+        // 모두 같은 씬 전환
+        PhotonNetwork.LoadLevel("Game");
     }
 
     void OnBackToTitle()
     {
         PhotonNetwork.Disconnect();
-        SceneManager.LoadScene("Title");
     }
 
-    // Game callbacks
-    void SpawnPlayer()
+    public override void OnDisconnected(DisconnectCause cause)
     {
-        if (spawnPoints == null || spawnPoints.Count == 0 || playerPrefab == null) return;
-        // ActorNumber 기반으로 인덱스 계산 (겹치지 않음)
-        int actorIndex = PhotonNetwork.LocalPlayer.ActorNumber - 1;
-        int idx = actorIndex % spawnPoints.Count;
-        Transform sp = spawnPoints[idx];
-        PhotonNetwork.Instantiate(
-            playerPrefab.name,
-            sp.position,
-            sp.rotation);
+        SceneManager.LoadScene("Title");
     }
 
     public override void OnLeftRoom()
