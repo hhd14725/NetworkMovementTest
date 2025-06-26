@@ -11,8 +11,6 @@ public class CinemachineCameraController : MonoBehaviourPun
     {
         vCam = GetComponent<CinemachineVirtualCamera>();
         vCam.Priority = 0;  // 기본 우선순위
-        if (!photonView.IsMine)
-            vCam.gameObject.SetActive(false);
 
     }
 

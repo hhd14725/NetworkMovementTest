@@ -143,8 +143,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         {
             float lag = Time.time - lastPacketTime;
             Vector3 predictedPos = networkPos + networkVel * lag;
-            transform.position = Vector3.Lerp(transform.position, predictedPos, 0.1f);
-            transform.rotation = Quaternion.Slerp(transform.rotation, networkRot, 0.1f);
+            rb.position = Vector3.Lerp(transform.position, predictedPos, 0.1f);
+            rb.rotation = Quaternion.Slerp(transform.rotation, networkRot, 0.1f);
 
         }
 
