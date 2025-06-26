@@ -9,6 +9,9 @@ public class CinemachineCameraController : MonoBehaviourPun
     CinemachineVirtualCamera vCam;
     CinemachineCollider colliderExt;
 
+    [Header("Assign this in the prefab")]
+    [SerializeField] Transform cameraPivot;
+
     void Awake()
     {
         vCam = GetComponent<CinemachineVirtualCamera>();
@@ -22,13 +25,13 @@ public class CinemachineCameraController : MonoBehaviourPun
         }
 
         // Local 플레이어는 Priority 세팅 + Follow/LookAt
-        Transform pivot = transform.Find("CameraPivot");
-        if (pivot == null)
+        //Transform pivot = transform.Find("CameraPivot");
+        if (cameraPivot == null)
             Debug.LogError("CameraPivot을 찾을 수 없습니다!", this);
         else
         {
-            vCam.Follow = pivot;
-            vCam.LookAt = pivot;
+            vCam.Follow = cameraPivot;
+            vCam.LookAt = cameraPivot;
         }
         vCam.Priority = 100;
 

@@ -996,9 +996,9 @@ MonoBehaviour:
   yawTorque: 200
   pitchTorque: 200
   rollTorque: 200
-  thrust: 15000
-  upThrust: 250
-  strafeThrust: 10000
+  thrust: 60000
+  upThrust: 10000
+  strafeThrust: 35000
   thrustGlideReduction: 0.98
   upDownGlideReduction: 0.98
   leftRightGlideReduction: 0.98
@@ -2035,6 +2035,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43d21b61a101908489d1ddfc972a2f75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cameraPivot: {fileID: 71038875162939086}
 --- !u!114 &2844364835115935493
 MonoBehaviour:
   m_ObjectHideFlags: 0
