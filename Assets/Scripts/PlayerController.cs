@@ -5,25 +5,49 @@ using Photon.Pun;
 [RequireComponent(typeof(Rigidbody), typeof(PlayerInput))]
 public class PlayerController : MonoBehaviourPun, IPunObservable
 {
-    [Header("Thrust Settings")]
-    public float forwardThrust = 12f, strafeThrust = 9f, verticalThrust = 9f, maxSpeed = 15f;
-    [Header("Rotation Settings")]
-    public float yawSpeed = 120f, pitchSpeed = 120f, rollSpeed = 50f;
-    [Header("Damping")]
-    [Range(0f, 1f)] public float linearDamping = 0.05f, angularDamping = 0.05f;
+    [Header("PlayerMovement Settings")]
+    [SerializeField]
+    private float yawTorque = 100f;
+    [SerializeField]
+    private float pitchTorque = 200f;
+    [SerializeField]
+    private float rollTorque = 500f;
+    [SerializeField]
+    private float thrust = 100f;
+    [SerializeField]
+    private float upThrust = 50f;
+    [SerializeField]
+    private float strafeThrust = 50f;
+    [SerializeField]
+    [Range(0.001f, 0.999f)]
+    private float thrustGlideReduction = 0.5f;
+    [SerializeField]
+    [Range(0.001f, 0.999f)]
+    private float upDownGlideReduction = 0.111f;
+    [SerializeField]
+    [Range(0.001f, 0.999f)]
+    private float leftRightGlideReduction = 0.111f;
+    private float glide, verticalGlide, horizontalGlide = 0f;
+    private float currentThrust;
+    private float angularDamping = 0.05f;
+    private float linearDamping = 0.05f;
+
+    [SerializeField]
+    [Range(0f, 1f)]
+    private float bounceFactor = 0.1f;
+
+    private Rigidbody rb;
+
+    private float thrust1D, strafe1D, upDown1D, roll1D;
+    private Vector2 pitchYaw;
+
     [Header("Shooting")]
     public string projectilePrefabName = "Projectile";
     public Transform muzzleTransform;
     public float fireCooldown = 0.2f;
-    [Header("References")]
-    public Transform cameraPivot;
-    public Animator animator;
+    private float lastFireTime = 0;
 
-    [Header("Friction Settings")]
-    [Tooltip("입력이 없을 때 적용할 drag 값. (높을수록 빨리 멈춤)")]
-    public float coastingDrag = 0.01f;
-
-
+    private PlayerInput pi;
     // smoothing
     private Vector3 networkPos;
     private Quaternion networkRot;
@@ -31,30 +55,19 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     private Vector3 networkAngVel;
     private float lastPacketTime;
 
-    // input
-    private PlayerInput pi;
-    private Vector2 moveInput, lookInput;
-    private bool thrustUp, thrustDown, rollLeft, rollRight;
-
-    private Rigidbody rb;
-    private float lastFireTime;
-    private float pitchAngle;
-
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         //rb.useGravity = false;
-        //rb.drag = 0f;
-        //rb.angularDrag = 0.05f;
-        //rb.interpolation = RigidbodyInterpolation.Extrapolate;
-
+        //rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         pi = GetComponent<PlayerInput>();
         pi.actions.Disable();
 
         networkPos = transform.position;
         networkRot = transform.rotation;
     }
-        
+
     void Start()
     {
         if (photonView.IsMine)
@@ -67,111 +80,193 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         {
             pi.actions.Disable();
         }
+
     }
 
     void OnEnable()
     {
         if (!photonView.IsMine) return;
         var a = pi.actions;
-        a["Move"].performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        a["Move"].canceled += ctx => moveInput = Vector2.zero;
-        a["Look"].performed += ctx => lookInput = ctx.ReadValue<Vector2>();
-        a["Look"].canceled += ctx => lookInput = Vector2.zero;
-        a["ThrustUp"].performed += ctx => thrustUp = true;
-        a["ThrustUp"].canceled += ctx => thrustUp = false;
-        a["ThrustDown"].performed += ctx => thrustDown = true;
-        a["ThrustDown"].canceled += ctx => thrustDown = false;
-        a["RollLeft"].performed += ctx => rollLeft = true;
-        a["RollLeft"].canceled += ctx => rollLeft = false;
-        a["RollRight"].performed += ctx => rollRight = true;
-        a["RollRight"].canceled += ctx => rollRight = false;
-        a["Fire"].performed += ctx => TryFire();
+        a["Thrust"].performed += OnThrust;
+        a["Thrust"].canceled += ctx => thrust1D = 0f;
+        a["Strafe"].performed += OnStrafe;
+        a["Strafe"].canceled += ctx => strafe1D = 0f;
+        a["UpDown"].performed += OnUpDown;
+        a["UpDown"].canceled += ctx => upDown1D = 0f;
+        a["RollKB"].performed += OnRoll;
+        a["RollKB"].canceled += ctx => roll1D = 0f;
+        a["PitchYaw"].performed += OnPitchYaw;
+        a["PitchYaw"].canceled += ctx => pitchYaw = Vector2.zero;
+        a["Fire"].performed += OnFire;
+
     }
 
     void OnDisable()
     {
         if (!photonView.IsMine) return;
+
         var a = pi.actions;
-        a["Move"].performed -= ctx => moveInput = ctx.ReadValue<Vector2>();
-        a["Move"].canceled -= ctx => moveInput = Vector2.zero;
-        a["Look"].performed -= ctx => lookInput = ctx.ReadValue<Vector2>();
-        a["Look"].canceled -= ctx => lookInput = Vector2.zero;
-        a["ThrustUp"].performed -= ctx => thrustUp = true;
-        a["ThrustUp"].canceled -= ctx => thrustUp = false;
-        a["ThrustDown"].performed -= ctx => thrustDown = true;
-        a["ThrustDown"].canceled -= ctx => thrustDown = false;
-        a["RollLeft"].performed -= ctx => rollLeft = true;
-        a["RollLeft"].canceled -= ctx => rollLeft = false;
-        a["RollRight"].performed -= ctx => rollRight = true;
-        a["RollRight"].canceled -= ctx => rollRight = false;
-        a["Fire"].performed -= ctx => TryFire();
+        a["Thrust"].performed -= OnThrust;
+        a["Thrust"].canceled -= ctx => thrust1D = 0f;
+        a["Strafe"].performed -= OnStrafe;
+        a["Strafe"].canceled -= ctx => strafe1D = 0f;
+        a["UpDown"].performed -= OnUpDown;
+        a["UpDown"].canceled -= ctx => upDown1D = 0f;
+        a["RollKB"].performed -= OnRoll;
+        a["RollKB"].canceled -= ctx => roll1D = 0f;
+        a["PitchYaw"].performed -= OnPitchYaw;
+        a["PitchYaw"].canceled -= ctx => pitchYaw = Vector2.zero;
+
+        a["Fire"].performed -= OnFire;
     }
+
+
+
 
     void FixedUpdate()
     {
-       
 
         if (photonView.IsMine)
         {
+            HandleMovement();
+            HandleInPuteRotate();
 
-            // 이동력
-            Vector3 thrust = transform.forward * moveInput.y * forwardThrust
-                           + transform.right * moveInput.x * strafeThrust
-                           + transform.up * ((thrustUp ? 1f : 0f) + (thrustDown ? -1f : 0f)) * verticalThrust;
-            rb.AddForce(thrust, ForceMode.Acceleration);
-
-            //감속로직
-            //bool isThrusting = moveInput.sqrMagnitude > 0f || thrustUp || thrustDown;
-            //rb.drag = isThrusting ? 0f : coastingDrag;
-
-            // 회전 토크: Yaw, Roll 만
-            float yaw = lookInput.x * yawSpeed * Time.fixedDeltaTime;
-            float delta = -lookInput.y * pitchSpeed * Time.fixedDeltaTime;
-            float roll = (rollRight ? 1f : 0f) * rollSpeed * Time.fixedDeltaTime
-                       - (rollLeft ? 1f : 0f) * rollSpeed * Time.fixedDeltaTime;
-            rb.AddRelativeTorque(new Vector3(delta, yaw, roll), ForceMode.Acceleration);
-
-            // 속도 제한
-            if (rb.velocity.magnitude > maxSpeed)
-                rb.velocity = rb.velocity.normalized * maxSpeed;
-
-
-            // 감쇠
-            //rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, linearDamping);
+            //// 감쇠
+            rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, linearDamping);
             rb.angularVelocity = Vector3.Lerp(rb.angularVelocity, Vector3.zero, angularDamping);
 
-            // 총구 오리엔테이션 보정 (muzzleTransform이 캐릭터 로컬 Z축과 일치하도록 확인)
+            //총구 오리엔테이션 보정(muzzleTransform이 캐릭터 로컬 Z축과 일치하도록 확인)
             if (muzzleTransform != null)
                 muzzleTransform.rotation = transform.rotation;
-
-            // 애니메이터
-            //if (animator)
-            //{
-            //    animator.SetFloat("Speed", rb.velocity.magnitude);
-            //    animator.SetFloat("Vertical", Vector3.Dot(transform.up, rb.velocity));
-            //}
         }
         else
         {
-            // 원격 플레이어 보간·예측
-            float lag = (Time.time - lastPacketTime);
+            float lag = Time.time - lastPacketTime;
             Vector3 predictedPos = networkPos + networkVel * lag;
-            rb.position = Vector3.Lerp(rb.position, predictedPos, 0.1f);
-            rb.rotation = Quaternion.Slerp(rb.rotation, networkRot, 0.1f);
+            rb.position = Vector3.Lerp(transform.position, predictedPos, 0.1f);
+            rb.rotation = Quaternion.Slerp(transform.rotation, networkRot, 0.1f);
+
         }
+
     }
 
     //void LateUpdate()
     //{
-    //    if (!photonView.IsMine || cameraPivot == null) return;
+    //    if (photonView.IsMine) return;
 
-    //    // 누적 피치 계산 (제한 없음)
-    //    float delta = -lookInput.y * pitchSpeed * Time.deltaTime;
-    //    pitchAngle += delta;
-
-    //    // Pivot에 로컬 X축 회전만 설정
-    //    cameraPivot.localRotation = Quaternion.Euler(pitchAngle, 0f, 0f);
+    //    // 원격 보간: transform만 갱신
+    //    float lag = Time.time - lastPacketTime;
+    //    Vector3 predictedPos = networkPos + networkVel * lag;
+    //    transform.position = Vector3.Lerp(transform.position, predictedPos, 0.1f);
+    //    transform.rotation = Quaternion.Slerp(transform.rotation, networkRot, 0.1f);
     //}
+
+    void HandleInPuteRotate()
+    {
+        //Roll
+        rb.AddRelativeTorque(Vector3.back * roll1D * rollTorque * Time.fixedDeltaTime);
+        //Pitch
+        rb.AddRelativeTorque(Vector3.right * Mathf.Clamp(-pitchYaw.y, -1f, 1f) * pitchTorque * Time.fixedDeltaTime);
+        //Yaw
+        rb.AddRelativeTorque(Vector3.up * Mathf.Clamp(pitchYaw.x, -1f, 1f) * yawTorque * Time.fixedDeltaTime);
+    }
+    void HandleMovement()
+    {
+        // Thrust
+        if (Mathf.Abs(thrust1D) > 0.1f)
+        {
+            // 부호를 보존한 후진/전진 thrust를 glide에 저장
+            glide = thrust1D * thrust;
+            rb.AddRelativeForce(Vector3.forward * glide * Time.fixedDeltaTime);
+        }
+        else
+        {
+            // glide 부호 그대로 후진 또는 전진 미끄러짐
+            rb.AddRelativeForce(Vector3.forward * glide * Time.fixedDeltaTime);
+            glide *= thrustGlideReduction;
+        }
+
+        // Up/Down, Strafe도 동일하게 수정
+        if (Mathf.Abs(upDown1D) > 0.1f)
+        {
+            verticalGlide = upDown1D * upThrust;
+            rb.AddRelativeForce(Vector3.up * verticalGlide * Time.fixedDeltaTime);
+        }
+        else
+        {
+            rb.AddRelativeForce(Vector3.up * verticalGlide * Time.fixedDeltaTime);
+            verticalGlide *= upDownGlideReduction;
+        }
+
+        if (Mathf.Abs(strafe1D) > 0.1f)
+        {
+            horizontalGlide = strafe1D * strafeThrust;
+            rb.AddRelativeForce(Vector3.right * horizontalGlide * Time.fixedDeltaTime);
+        }
+        else
+        {
+            rb.AddRelativeForce(Vector3.right * horizontalGlide * Time.fixedDeltaTime);
+            horizontalGlide *= leftRightGlideReduction;
+        }
+    }
+
+    #region Input Methods
+    public void OnThrust(InputAction.CallbackContext context)
+    {
+        thrust1D = context.ReadValue<float>();
+    }
+
+    public void OnStrafe(InputAction.CallbackContext context)
+    {
+        strafe1D = context.ReadValue<float>();
+    }
+    public void OnUpDown(InputAction.CallbackContext context)
+    {
+        upDown1D = context.ReadValue<float>();
+    }
+    public void OnRoll(InputAction.CallbackContext context)
+    {
+        roll1D = context.ReadValue<float>();
+    }
+    public void OnPitchYaw(InputAction.CallbackContext context)
+    {
+        pitchYaw = context.ReadValue<Vector2>();
+    }
+
+    public void OnFire(InputAction.CallbackContext context)
+    {
+        if (!photonView.IsMine) return;
+        if (context.performed)
+        {
+            TryFire();
+        }
+    }
+    #endregion
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        // 벽만 반응하도록 Tag 검사
+        if (!collision.gameObject.CompareTag("Wall")) return;
+
+        // 첫 접촉의 법선 벡터
+        Vector3 normal = collision.contacts[0].normal;
+
+        // 현재 속도
+        Vector3 v = rb.velocity;
+
+        // 법선 방향 성분
+        Vector3 vNormal = Vector3.Project(v, normal);
+        // 접선(벡터의 나머지) 성분
+        Vector3 vTangent = v - vNormal;
+
+        // 법선 성분은 반사(bounceFactor), 접선 성분은 그대로
+        Vector3 newVelocity = vTangent - vNormal * bounceFactor;
+        rb.velocity = newVelocity;
+    }
+
+
+
+
     private void TryFire()
     {
         if (Time.time - lastFireTime < fireCooldown || muzzleTransform == null) return;
@@ -190,7 +285,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     }
 
-    // 네트워크 동기화
+
+
+
+    //네트워크 동기화
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)

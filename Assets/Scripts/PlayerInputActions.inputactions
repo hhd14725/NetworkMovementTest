@@ -6,10 +6,46 @@
             "id": "89a069d8-6ba2-4da0-b5f0-163ec9afd2b2",
             "actions": [
                 {
-                    "name": "Look",
+                    "name": "Thrust",
+                    "type": "PassThrough",
+                    "id": "7864dd01-2422-41ca-aff5-6e1ee132d8f4",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Strafe",
+                    "type": "PassThrough",
+                    "id": "aa8aa61c-b924-45fa-ad2e-a6f0daef0881",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "UpDown",
+                    "type": "PassThrough",
+                    "id": "484f8208-83dc-4572-9f9e-1d9e1940ea67",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RollKB",
+                    "type": "PassThrough",
+                    "id": "a9e96e3d-7b2d-4e76-a4c5-1bd9678f47ce",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PitchYaw",
                     "type": "Value",
-                    "id": "a92cf5ce-ed0a-4c1f-b248-f945967bff68",
-                    "expectedControlType": "Vector2",
+                    "id": "04631c4a-dc4a-436a-9e77-4efc2c66651f",
+                    "expectedControlType": "Delta",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -17,73 +53,160 @@
                 {
                     "name": "Fire",
                     "type": "Button",
-                    "id": "586fed52-8e14-4ea6-98ae-309845a81383",
+                    "id": "c58691cb-3817-4f85-a088-077621a5f42c",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "ThrustUp",
-                    "type": "Button",
-                    "id": "28e5a7bd-e22a-455b-a054-fbf14ea4ffb7",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "ThrustDown",
-                    "type": "Button",
-                    "id": "d3f20085-fb2d-4ceb-aecd-a66e87c85339",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "RollLeft",
-                    "type": "Button",
-                    "id": "0bc4ab5f-b966-44c6-9d4f-fa3decc64bc2",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "RollRight",
-                    "type": "Button",
-                    "id": "f6919ba9-e656-4dc1-922d-bf283a065306",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Move",
-                    "type": "Value",
-                    "id": "bcb87bd8-ad19-425f-a558-e19fcc48e346",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
                 }
             ],
             "bindings": [
                 {
+                    "name": "ThrustKB",
+                    "id": "235b4da7-271c-4b63-b28e-37dbc76ba136",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Thrust",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "48b0675c-5161-46fe-9f22-6d8dece91533",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Thrust",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "d5ccdda7-cc60-43df-b098-f30af90bf661",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Thrust",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "StrafeKB",
+                    "id": "39731da3-1354-47af-be17-147953974309",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Strafe",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "3d3e9b14-a329-4ea6-8d8c-c8f6c18bf647",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Strafe",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "473efb9e-b841-410a-8b65-ff2bd4219829",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Strafe",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "UpDownKB",
+                    "id": "b9be186c-750f-4a43-b40b-e81e159bf19b",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "UpDown",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "f823c42c-6c22-4f59-a4fc-c7c6a0587d92",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "UpDown",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "7158c641-b8a3-4abf-a65c-6964a6c53571",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "UpDown",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "RollKB",
+                    "id": "3ce5269a-1dc2-4d9f-99ca-b91528e03428",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RollKB",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "314f7b50-687b-4317-abea-acbb8d9f1e90",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RollKB",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "389625c0-a410-4597-be3c-33b331fa8af6",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RollKB",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
-                    "id": "b8c889b3-0e8a-4ea0-9076-bd2e9451cc14",
+                    "id": "7d341204-11f4-44dc-85f3-b39dad1672bc",
                     "path": "<Mouse>/delta",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Look",
+                    "action": "PitchYaw",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "7629d386-be2f-47bb-9cc8-335689f754bd",
+                    "id": "7e17e4db-71c0-472f-9037-a94820b53b2f",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
@@ -91,105 +214,6 @@
                     "action": "Fire",
                     "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "9c75cec2-bbbf-48f4-8ea7-3563a3be02b4",
-                    "path": "<Keyboard>/e",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ThrustUp",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "26464103-10f8-461e-9894-9af39f83d356",
-                    "path": "<Keyboard>/q",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ThrustDown",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "92f8be21-04f1-4eb4-95f1-22d10a75e785",
-                    "path": "<Keyboard>/z",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "RollLeft",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "8d173c07-ede5-4bcc-acff-3d76fca5f093",
-                    "path": "<Keyboard>/c",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "RollRight",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "2D Vector",
-                    "id": "7aec0bb9-034a-442e-88fb-d78cb5c19184",
-                    "path": "2DVector",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "up",
-                    "id": "e3e0547a-16bb-48ae-9a27-a28e042b6f1d",
-                    "path": "<Keyboard>/w",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "down",
-                    "id": "ec91fb2c-5736-4503-8eb9-434251d2f18d",
-                    "path": "<Keyboard>/s",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "left",
-                    "id": "c61a3b9a-552f-4dbb-8791-0cdbbb1e76bb",
-                    "path": "<Keyboard>/a",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "right",
-                    "id": "eabd366c-66ed-40b1-a6a7-d729c10bf38a",
-                    "path": "<Keyboard>/d",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": true
                 }
             ]
         }
